@@ -1,57 +1,75 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const WebpackPwaManifest = require('webpack-pwa-manifest');
-const path = require('path');
-const { InjectManifest } = require('workbox-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// Imports
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const WebpackPwaManifest = require("webpack-pwa-manifest");
+const path = require("path");
+const { InjectManifest } = require("workbox-webpack-plugin");
 
+// Workbox plugins for service worker and manifest file
 module.exports = () => {
   return {
-    mode: 'development',
+    mode: "development",
     entry: {
-      main: './src/js/index.js',
-      install: './src/js/install.js',
+      main: "./src/js/index.js",
+      install: "./src/js/install.js",
     },
     output: {
-      filename: '[name].bundle.js',
-      path: path.resolve(__dirname, 'dist'),
+      filename: "[name].bundle.js",
+      path: path.resolve(__dirname, "dist"),
     },
     plugins: [
+      // Webpack plugin that generates our html file and injects our bundles
       new HtmlWebpackPlugin({
-        template: './src/index.html',
-        title: 'Webpack App',
+        template: "./index.html",
+        title: "Text Editor",
       }),
+
+      // Injects our custom service worker
       new InjectManifest({
-        swSrc: './src-sw.js',
-        swDest: 'service-worker.js',
+        swSrc: "./src-sw.js",
+        swDest: "src-sw.js",
       }),
+
+      // Creates a manifest.json file
       new WebpackPwaManifest({
-        name: 'Your App Name',
-        short_name: 'AppShortName',
-        description: 'Your App Description',
-        background_color: '#ffffff',
-        crossorigin: 'use-credentials', 
+        fingerprints: false,
+        inject: true,
+        name: "Text Editor",
+        short_name: "Text",
+        description: "Keep you notes here!",
+        background_color: "#225ca3",
+        theme_color: "#225ca3",
+        start_url: "/",
+        publicPath: "/",
         icons: [
           {
-            src: path.resolve('src/assets/icon.png'),
-            sizes: [96, 128, 192, 256, 384, 512], 
+            src: path.resolve("src/images/logo.png"),
+            sizes: [96, 128, 192, 256, 384, 512],
+            destination: path.join("assets", "icons"),
           },
         ],
       }),
-      new MiniCssExtractPlugin(),
     ],
+
+    // CSS loaders and babel to webpack
     module: {
+      // CSS loaders
       rules: [
         {
-          test: /\.css$/,
-          use: [MiniCssExtractPlugin.loader, 'css-loader'],
+          test: /\.css$/i,
+          use: ["style-loader", "css-loader"],
         },
         {
-          test: /\.js$/,
+          test: /\.m?js$/,
           exclude: /node_modules/,
+          // Babel-loader -> in order to use ES6
           use: {
-            loader: 'babel-loader',
+            loader: "babel-loader",
             options: {
-              presets: ['@babel/preset-env'],
+              presets: ["@babel/preset-env"],
+              plugins: [
+                "@babel/plugin-proposal-object-rest-spread",
+                "@babel/transform-runtime",
+              ],
             },
           },
         },
