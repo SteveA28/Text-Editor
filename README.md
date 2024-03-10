@@ -13,7 +13,7 @@ I used visual studio code to create this code.
 
 <img src="textedit.png">
 
-##DEPLOYEMENT
+## DEPLOYEMENT
 
 https://text-editor-ob92.onrender.com
 
